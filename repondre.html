@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionnaire</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04080f;--surface:#0b1220;--surface2:#111d30;--border:rgba(255,255,255,.07);--accent:#00d4aa;--text:#e2e8f0;--muted:#4a6380;--card:#0d1828;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.container{width:100%;max-width:620px}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;text-align:center;margin-bottom:18px}
+.logo span{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:14px}
+.q-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:var(--accent);margin-bottom:4px}
+.q-subtitle{font-size:.82rem;color:var(--muted);margin-bottom:18px}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;transition:border-color .2s}
+.q-card.has-error{border-color:rgba(244,63,94,.5)}
+.q-label{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+.q-num{min-width:22px;height:22px;background:rgba(0,212,170,.12);border:1px solid rgba(0,212,170,.2);border-radius:4px;font-size:.7rem;font-weight:700;color:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.req{color:#f43f5e;margin-left:2px}
+.opt-tag{font-size:.62rem;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:1px 5px;margin-left:4px}
+input[type=text],input[type=number],input[type=date],select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:10px 12px;width:100%;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;}
+input:focus,select:focus,textarea:focus{border-color:rgba(0,212,170,.4)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+.options-list{display:flex;flex-direction:column;gap:8px}
+.opt-item{display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;cursor:pointer;transition:all .15s}
+.opt-item:hover{border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.04)}
+.opt-item.selected{border-color:rgba(0,212,170,.5);background:rgba(0,212,170,.08)}
+.opt-item input[type=radio],.opt-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+.opt-item label{font-size:.86rem;cursor:pointer;flex:1}
+.scale-row{display:flex;gap:8px;flex-wrap:wrap}
+.scale-btn{flex:1;min-width:44px;padding:10px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-weight:700;font-size:.9rem;cursor:pointer;text-align:center;transition:all .15s}
+.scale-btn:hover{border-color:rgba(0,212,170,.4)}
+.scale-btn.selected{background:rgba(0,212,170,.15);border-color:var(--accent);color:var(--accent)}
+.scale-labels{display:flex;justify-content:space-between;font-size:.65rem;color:var(--muted);margin-top:5px;padding:0 2px}
+.progress-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-bottom:18px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#3b82f6);transition:width .4s ease;border-radius:2px}
+.btn-submit{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),rgba(0,212,170,.8));color:#000;font-weight:800;font-size:.95rem;font-family:'Syne',sans-serif;border:none;border-radius:8px;cursor:pointer;margin-top:8px;box-shadow:0 8px 24px rgba(0,212,170,.2);transition:all .2s}
+.btn-submit:active{transform:scale(.98)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+.btn-again{width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Syne',sans-serif;font-weight:600;font-size:.88rem;border-radius:8px;cursor:pointer;margin-top:10px}
+.loading{text-align:center;padding:50px 20px;color:var(--muted)}
+.spinner{display:inline-block;width:30px;height:30px;border:3px solid rgba(0,212,170,.15);border-radius:50%;border-top-color:var(--accent);animation:spin 1s ease-in-out infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{padding:11px 14px;background:rgba(244,63,94,.1);border-left:3px solid #f43f5e;border-radius:6px;font-size:.82rem;color:#fb7185;margin:10px 0}
+.success-wrap{text-align:center;padding:40px 20px}
+.success-icon{font-size:3rem;margin-bottom:16px}
+.success-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--accent);margin-bottom:8px}
+.success-sub{font-size:.85rem;color:var(--muted)}
+</style>
+<script src="https://www.google.com/recaptcha/api.js?render=6LeiyTgtAAAAAAV9K5loleOhtmmWf5_u4kgsKv2y"></script>
+</head>
+<body>
+<div class="container">
+  <div class="logo">Stat<span>Analyse</span> Pro</div>
+  <div id="stateLoading" class="card loading">
+    <div class="spinner"></div>
+    <p>Chargement du questionnaire...</p>
+  </div>
+  <div id="stateError" class="card" style="display:none">
+    <div class="error-box" id="errorMsg">Questionnaire introuvable.</div>
+  </div>
+  <div id="stateForm" style="display:none">
+    <div class="card">
+      <div class="q-title" id="formTitle"></div>
+      <div class="q-subtitle" id="formSubtitle"></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div id="formFields"></div>
+      <div id="formError" class="error-box" style="display:none"></div>
+      <button class="btn-submit" id="btnSubmit" onclick="submitResponse()">✅ Envoyer mes réponses</button>
+    </div>
+  </div>
+  <div id="stateSuccess" class="card success-wrap" style="display:none">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">Réponse envoyée !</div>
+    <p class="success-sub">Merci pour votre participation.</p>
+    <button class="btn-again" onclick="repondreEncore()">Remplir à nouveau</button>
+  </div>
+</div>
+
+<script>
+const FS_PROJECT = 'statanalyse-pro';
+const RECAPTCHA_SITE_KEY = '6LeiyTgtAAAAAAV9K5loleOhtmmWf5_u4kgsKv2y';
+const FS_API_KEY = 'AIzaSyA3pT5-TNZTiOUz3AeMRUBdblucyp0EWSI';
+let QUESTIONNAIRE = null;
+
+function fsToObj(doc) {
+  const out = { _id: doc.name.split('/').pop() };
+  for (const [k, v] of Object.entries(doc.fields || {})) {
+    if (v.stringValue !== undefined) out[k] = v.stringValue;
+    else if (v.integerValue !== undefined) out[k] = v.integerValue;
+    else if (v.booleanValue !== undefined) out[k] = v.booleanValue;
+    else if (v.arrayValue !== undefined) out[k] = (v.arrayValue.values || []).map(i => i.stringValue || '');
+    else if (v.mapValue !== undefined) out[k] = fsToObj({ name:'', fields: v.mapValue.fields || {} });
+  }
+  return out;
+}
+
+function objToFs(obj) {
+  const fields = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (Array.isArray(v)) fields[k] = { arrayValue: { values: v.map(i => ({ stringValue: String(i) })) } };
+    else if (typeof v === 'object' && v !== null) fields[k] = { mapValue: { fields: objToFs(v) } };
+    else if (typeof v === 'number') fields[k] = { integerValue: String(v) };
+    else if (typeof v === 'boolean') fields[k] = { booleanValue: v };
+    else fields[k] = { stringValue: String(v ?? '') };
+  }
+  return fields;
+}
+
+async function getAppCheckToken() {
+  return new Promise((resolve) => {
+    grecaptcha.ready(async () => {
+      try {
+        const token = await grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' });
+        resolve(token);
+      } catch(e) { resolve(null); }
+    });
+  });
+}
+
+async function fsQuery(col, field, value) {
+  const url = `https://firestore.googleapis.com/v1/projects/${FS_PROJECT}/databases/(default)/documents:runQuery?key=${FS_API_KEY}`;
+  const body = {
+    structuredQuery: {
+      from: [{ collectionId: col }],
+      where: { fieldFilter: { field: { fieldPath: field }, op: 'EQUAL', value: { stringValue: value } } }
+    }
+  };
+  const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  if (!res.ok) throw new Error(await res.text());
+  const data = await res.json();
+  return data.filter(d => d.document).map(d => fsToObj(d.document));
+}
+
+async function fsAdd(col, obj) {
+  const appCheckToken = await getAppCheckToken();
+  const res = await fetch(
+    `https://firestore.googleapis.com/v1/projects/${FS_PROJECT}/databases/(default)/documents/${col}?key=${FS_API_KEY}`,
+    { method:'POST', headers:{'Content-Type':'application/json', ...(appCheckToken ? {'X-Firebase-AppCheck': appCheckToken} : {})}, body: JSON.stringify({ fields: objToFs(obj) }) }
+  );
+  if (!res.ok) throw new Error(await res.text());
+  return await res.json();
+}
+
+async function init() {
+  const qid = new URLSearchParams(window.location.search).get('q');
+  if (!qid) { showError('Lien invalide — aucun questionnaire spécifié.'); return; }
+  try {
+    const results = await fsQuery('questionnaires', 'qid', qid);
+    if (!results.length) { showError('Questionnaire introuvable ou expiré.'); return; }
+    QUESTIONNAIRE = results[0];
+    try { QUESTIONNAIRE.variables = JSON.parse(QUESTIONNAIRE.variables || '[]'); } catch(e) { QUESTIONNAIRE.variables = []; }
+    if (!Array.isArray(QUESTIONNAIRE.variables)) QUESTIONNAIRE.variables = [];
+    renderForm();
+  } catch(e) { showError('Erreur de connexion : ' + e.message); }
+}
+
+function showError(msg) {
+  document.getElementById('stateLoading').style.display = 'none';
+  document.getElementById('stateError').style.display = 'block';
+  document.getElementById('errorMsg').textContent = msg;
+}
+
+function renderForm() {
+  document.getElementById('stateLoading').style.display = 'none';
+  document.getElementById('stateForm').style.display = 'block';
+  const vars = QUESTIONNAIRE.variables || [];
+  document.getElementById('formTitle').textContent = QUESTIONNAIRE.title || 'Questionnaire';
+  const obligCount = vars.filter(v => v.required !== false).length;
+  document.getElementById('formSubtitle').textContent = `${vars.length} question(s) — ${obligCount} obligatoire(s)`;
+  document.getElementById('formFields').innerHTML = vars.map((v, i) => buildField(v, i)).join('');
+  updateProgress();
+  document.getElementById('formFields').querySelectorAll('input,select,textarea').forEach(el => {
+    el.addEventListener('change', updateProgress);
+    el.addEventListener('input', updateProgress);
+  });
+}
+
+function buildField(v, i) {
+  const req = v.required !== false;
+  const reqHtml = req ? `<span class="req">*</span>` : `<span class="opt-tag">optionnel</span>`;
+  const labelHtml = `<div class="q-label"><span class="q-num">${i+1}</span><span>${v.name}${reqHtml}</span></div>`;
+  let inputHtml = '';
+  if (v.type === 'list') {
+    inputHtml = `<select id="field_${i}" onchange="updateProgress()"><option value="">— Sélectionner —</option>${(v.options||[]).map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`;
+  } else if (v.type === 'radio') {
+    inputHtml = `<div class="options-list" id="field_${i}">${(v.options||[]).map((o,oi)=>`<div class="opt-item" onclick="selectRadio(${i},${oi})"><input type="radio" name="radio_${i}" id="radio_${i}_${oi}" value="${o}"><label for="radio_${i}_${oi}">${o}</label></div>`).join('')}</div>`;
+  } else if (v.type === 'checkbox') {
+    inputHtml = `<div class="options-list" id="field_${i}">${(v.options||[]).map((o,oi)=>`<div class="opt-item" onclick="toggleCheck(this)"><input type="checkbox" id="check_${i}_${oi}" value="${o}" onchange="updateProgress()"><label for="check_${i}_${oi}">${o}</label></div>`).join('')}</div>`;
+  } else if (v.type === 'scale') {
+    inputHtml = `<div><div class="scale-row" id="field_${i}">${[1,2,3,4,5].map(n=>`<div class="scale-btn" onclick="selectScale(${i},${n})" data-val="${n}">${n}</div>`).join('')}</div><div class="scale-labels"><span>Pas du tout</span><span>Tout à fait</span></div></div>`;
+  } else if (v.type === 'number') {
+    inputHtml = `<input type="number" id="field_${i}" placeholder="Entrez un nombre" oninput="updateProgress()">`;
+  } else if (v.type === 'date') {
+    inputHtml = `<input type="date" id="field_${i}" onchange="updateProgress()">`;
+  } else {
+    inputHtml = `<input type="text" id="field_${i}" placeholder="Votre réponse…" oninput="updateProgress()">`;
+  }
+  return `<div class="q-card" id="qcard_${i}">${labelHtml}${inputHtml}</div>`;
+}
+
+function selectRadio(fieldIdx, optIdx) {
+  const container = document.getElementById('field_'+fieldIdx);
+  container.querySelectorAll('.opt-item').forEach(el => el.classList.remove('selected'));
+  const item = container.querySelectorAll('.opt-item')[optIdx];
+  item.classList.add('selected');
+  item.querySelector('input').checked = true;
+  updateProgress();
+}
+
+function toggleCheck(item) {
+  const cb = item.querySelector('input[type=checkbox]');
+  cb.checked = !cb.checked;
+  item.classList.toggle('selected', cb.checked);
+  updateProgress();
+}
+
+function selectScale(fieldIdx, val) {
+  const container = document.getElementById('field_'+fieldIdx);
+  container.querySelectorAll('.scale-btn').forEach(b => { b.classList.toggle('selected', parseInt(b.dataset.val) === val); });
+  container.dataset.val = val;
+  updateProgress();
+}
+
+function getFieldValue(v, i) {
+  if (v.type === 'radio') { const c = document.querySelector(`input[name="radio_${i}"]:checked`); return c ? c.value : ''; }
+  if (v.type === 'checkbox') { const vals = [...document.querySelectorAll(`#field_${i} input[type=checkbox]:checked`)].map(c=>c.value); return vals.length ? vals.join(', ') : ''; }
+  if (v.type === 'scale') { return document.getElementById('field_'+i)?.dataset.val || ''; }
+  const el = document.getElementById('field_'+i);
+  return el ? el.value.trim() : '';
+}
+
+function updateProgress() {
+  const vars = QUESTIONNAIRE?.variables || [];
+  let filled = 0;
+  vars.forEach((v, i) => { if (getFieldValue(v, i)) filled++; });
+  const pct = vars.length ? Math.round(filled / vars.length * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+async function submitResponse() {
+  const vars = QUESTIONNAIRE.variables || [];
+  const data = {};
+  let firstEmpty = -1;
+  vars.forEach((v, i) => {
+    const val = getFieldValue(v, i);
+    data[v.name] = val;
+    if (v.required !== false && !val && firstEmpty === -1) firstEmpty = i;
+  });
+  const errEl = document.getElementById('formError');
+  if (firstEmpty !== -1) {
+    errEl.style.display = 'block';
+    errEl.textContent = '⚠️ Veuillez remplir tous les champs obligatoires (marqués *).';
+    document.getElementById('qcard_'+firstEmpty).classList.add('has-error');
+    document.getElementById('qcard_'+firstEmpty).scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+  errEl.style.display = 'none';
+  document.querySelectorAll('.q-card').forEach(c => c.classList.remove('has-error'));
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true; btn.textContent = '⏳ Envoi en cours...';
+  try {
+    await fsAdd('responses', {
+      questionnaire_id: QUESTIONNAIRE.qid,
+      data: JSON.stringify(data),
+      created_at: new Date().toISOString()
+    });
+    document.getElementById('stateForm').style.display = 'none';
+    document.getElementById('stateSuccess').style.display = 'block';
+  } catch(e) {
+    errEl.style.display = 'block';
+    errEl.textContent = '❌ Erreur envoi : ' + e.message;
+    btn.disabled = false; btn.textContent = '✅ Envoyer mes réponses';
+  }
+}
+
+function repondreEncore() {
+  document.getElementById('stateSuccess').style.display = 'none';
+  document.getElementById('stateForm').style.display = 'block';
+  renderForm();
+  document.getElementById('btnSubmit').disabled = false;
+  document.getElementById('btnSubmit').textContent = '✅ Envoyer mes réponses';
+}
+
+init();
+</script>
+</body>
+</html>
